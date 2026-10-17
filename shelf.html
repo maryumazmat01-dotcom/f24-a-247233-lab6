@@ -62,14 +62,24 @@
           fetch("/tea")
         ]);
 
-        const penPrice = await penRes.text();
-        const copyPrice = await copyRes.text();
-        const teaPrice = await teaRes.text();
+        const penText = await penRes.text();
+        const copyText = await copyRes.text();
+        const teaText = await teaRes.text();
 
         // Update card prices on the board
-        document.getElementById("pen").textContent = penPrice;
-        document.getElementById("copy").textContent = copyPrice;
-        document.getElementById("tea").textContent = teaPrice;
+        document.getElementById("pen").textContent = penText;
+        document.getElementById("copy").textContent = copyText;
+        document.getElementById("tea").textContent = teaText;
+
+        // Parse prices as numbers to calculate till values dynamically
+        const pPen = Number(penText);
+        const pCopy = Number(copyText);
+        const pTea = Number(teaText);
+
+        // Topic 8: Calculate Dearest, Sum, and update Till display
+        document.getElementById("loaded").textContent = "3";
+        document.getElementById("dearest").textContent = Math.max(pPen, pCopy, pTea);
+        document.getElementById("sum").textContent = pPen + pCopy + pTea;
       } catch (err) {
         console.error("Fetch error:", err);
       }
