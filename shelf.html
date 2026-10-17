@@ -85,6 +85,9 @@
         document.getElementById("loaded").textContent = "3";
         document.getElementById("dearest").textContent = Math.max(pPen, pCopy, pTea);
         document.getElementById("sum").textContent = pPen + pCopy + pTea;
+
+        // Reset status line after successful load
+        status.textContent = "Shelf loaded.";
       } catch (err) {
         // Topic 9: Handle stopped server / network failure
         status.textContent = "The server is not answering.";
@@ -99,6 +102,7 @@
         document.getElementById("dearest").textContent = "0";
         document.getElementById("sum").textContent = "0";
       } finally {
+        // Topic 10: Ensure the button becomes clickable again in both success and error cases
         btn.disabled = false;
       }
     }
