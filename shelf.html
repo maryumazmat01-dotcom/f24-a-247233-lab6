@@ -53,6 +53,26 @@
       // Topic 6: Change status text and disable button
       status.textContent = "Loading…";
       btn.disabled = true;
+
+      try {
+        // Topic 7: Request pen, copy, and tea in parallel so they arrive in one wait
+        const [penRes, copyRes, teaRes] = await Promise.all([
+          fetch("/pen"),
+          fetch("/copy"),
+          fetch("/tea")
+        ]);
+
+        const penPrice = await penRes.text();
+        const copyPrice = await copyRes.text();
+        const teaPrice = await teaRes.text();
+
+        // Update card prices on the board
+        document.getElementById("pen").textContent = penPrice;
+        document.getElementById("copy").textContent = copyPrice;
+        document.getElementById("tea").textContent = teaPrice;
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
     }
 
     // Topic 5: Attach event listener
