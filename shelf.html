@@ -19,17 +19,17 @@
     <h1>Stationery</h1>
   </header>
 
-  <!-- Topic 2: Status line -->
+  <!-- Topic 2 & 11: Initial sentence in status line -->
   <p id="status">Ready to load shelf.</p>
 
-  <!-- Topic 2: Board section with cards and empty price spans -->
+  <!-- Topic 2 & 11: Board section with cards and empty price spans -->
   <div id="board">
     <div class="card">Pen: <span id="pen"></span></div>
     <div class="card">Copy: <span id="copy"></span></div>
     <div class="card">Tea: <span id="tea"></span></div>
   </div>
 
-  <!-- Topic 3: Till section (Loaded, Dearest, Sum starting at 0) -->
+  <!-- Topic 3 & 11: Till section (Loaded, Dearest, Sum starting at 0) -->
   <div id="till">
     <p>Loaded: <span id="loaded">0</span></p>
     <p>Dearest: <span id="dearest">0</span></p>
@@ -102,7 +102,7 @@
         document.getElementById("dearest").textContent = "0";
         document.getElementById("sum").textContent = "0";
       } finally {
-        // Topic 10: Ensure the button becomes clickable again in both success and error cases
+        // Topic 10: Ensure the button becomes clickable again
         btn.disabled = false;
       }
     }
