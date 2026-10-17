@@ -36,13 +36,23 @@
     <p>Sum: <span id="sum">0</span></p>
   </div>
 
-  <!-- Button -->
+  <!-- Topic 5: Load button -->
   <button id="load">Load the shelf</button>
 
   <!-- Topic 1: Footer -->
   <footer>
     <p>247233</p>
   </footer>
+
+  <!-- Topic 5: JavaScript adding event listener without calling it immediately -->
+  <script>
+    async function loadShelf() {
+      // Logic for fetching data will go here in later topics
+    }
+
+    // Attach click listener to the button
+    document.getElementById("load").addEventListener("click", loadShelf);
+  </script>
 
 </body>
 </html>
