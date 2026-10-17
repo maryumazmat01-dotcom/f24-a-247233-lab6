@@ -44,13 +44,18 @@
     <p>247233</p>
   </footer>
 
-  <!-- Topic 5: JavaScript adding event listener without calling it immediately -->
+  <!-- JavaScript -->
   <script>
     async function loadShelf() {
-      // Logic for fetching data will go here in later topics
+      const btn = document.getElementById("load");
+      const status = document.getElementById("status");
+
+      // Topic 6: Change status text and disable button
+      status.textContent = "Loading…";
+      btn.disabled = true;
     }
 
-    // Attach click listener to the button
+    // Topic 5: Attach event listener
     document.getElementById("load").addEventListener("click", loadShelf);
   </script>
 
