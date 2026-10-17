@@ -55,12 +55,17 @@
       btn.disabled = true;
 
       try {
-        // Topic 7: Request pen, copy, and tea in parallel so they arrive in one wait
+        // Topic 7: Request pen, copy, and tea in parallel
         const [penRes, copyRes, teaRes] = await Promise.all([
           fetch("/pen"),
           fetch("/copy"),
           fetch("/tea")
         ]);
+
+        // Check if server responses are valid
+        if (!penRes.ok || !copyRes.ok || !teaRes.ok) {
+          throw new Error("Server error");
+        }
 
         const penText = await penRes.text();
         const copyText = await copyRes.text();
@@ -71,17 +76,30 @@
         document.getElementById("copy").textContent = copyText;
         document.getElementById("tea").textContent = teaText;
 
-        // Parse prices as numbers to calculate till values dynamically
+        // Parse prices as numbers
         const pPen = Number(penText);
         const pCopy = Number(copyText);
         const pTea = Number(teaText);
 
-        // Topic 8: Calculate Dearest, Sum, and update Till display
+        // Topic 8: Update Till display
         document.getElementById("loaded").textContent = "3";
         document.getElementById("dearest").textContent = Math.max(pPen, pCopy, pTea);
         document.getElementById("sum").textContent = pPen + pCopy + pTea;
       } catch (err) {
-        console.error("Fetch error:", err);
+        // Topic 9: Handle stopped server / network failure
+        status.textContent = "The server is not answering.";
+        
+        // Blank the three prices
+        document.getElementById("pen").textContent = "";
+        document.getElementById("copy").textContent = "";
+        document.getElementById("tea").textContent = "";
+
+        // Reset Loaded, Dearest, and Sum back to 0
+        document.getElementById("loaded").textContent = "0";
+        document.getElementById("dearest").textContent = "0";
+        document.getElementById("sum").textContent = "0";
+      } finally {
+        btn.disabled = false;
       }
     }
 
