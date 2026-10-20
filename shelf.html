@@ -1,114 +1,249 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The shelf</title>
+
   <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      color: #222;
+    }
+
     header {
       background-color: teal;
       color: white;
       padding: 15px;
       text-align: center;
     }
+
+    header h1 {
+      margin: 0;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 25px auto;
+      padding: 0 20px;
+    }
+
+    #status {
+      padding: 12px;
+      background-color: white;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    #board {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin: 25px 0;
+    }
+
+    .card {
+      flex: 1;
+      min-width: 130px;
+      padding: 22px 15px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .price {
+      display: block;
+      min-height: 30px;
+      margin-top: 12px;
+      font-size: 26px;
+      font-weight: bold;
+      color: teal;
+    }
+
+    #till {
+      padding: 15px 20px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    #till p {
+      display: flex;
+      justify-content: space-between;
+      margin: 12px 0;
+    }
+
+    button {
+      display: block;
+      margin: 25px auto;
+      padding: 12px 24px;
+      background-color: teal;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #006666;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    footer {
+      margin-top: 35px;
+      padding: 15px;
+      background-color: #e5e7eb;
+      text-align: center;
+    }
   </style>
 </head>
+
 <body>
 
-  <!-- Topic 1: Header -->
   <header>
     <h1>Stationery</h1>
   </header>
 
-  <!-- Topic 2 & 11: Initial sentence in status line -->
-  <p id="status">Ready to load shelf.</p>
+  <main>
+    <p id="status">Ready to load shelf.</p>
 
-  <!-- Topic 2 & 11: Board section with cards and empty price spans -->
-  <div id="board">
-    <div class="card">Pen: <span id="pen"></span></div>
-    <div class="card">Copy: <span id="copy"></span></div>
-    <div class="card">Tea: <span id="tea"></span></div>
-  </div>
+    <section id="board">
+      <div class="card">
+        Pen
+        <span id="pen" class="price"></span>
+      </div>
 
-  <!-- Topic 3 & 11: Till section (Loaded, Dearest, Sum starting at 0) -->
-  <div id="till">
-    <p>Loaded: <span id="loaded">0</span></p>
-    <p>Dearest: <span id="dearest">0</span></p>
-    <p>Sum: <span id="sum">0</span></p>
-  </div>
+      <div class="card">
+        Copy
+        <span id="copy" class="price"></span>
+      </div>
 
-  <!-- Topic 5: Load button -->
-  <button id="load">Load the shelf</button>
+      <div class="card">
+        Tea
+        <span id="tea" class="price"></span>
+      </div>
+    </section>
 
-  <!-- Topic 1: Footer -->
+    <section id="till">
+      <p>
+        <span>Loaded</span>
+        <strong id="loaded">0</strong>
+      </p>
+
+      <p>
+        <span>Dearest</span>
+        <strong id="dearest">0</strong>
+      </p>
+
+      <p>
+        <span>Sum</span>
+        <strong id="sum">0</strong>
+      </p>
+    </section>
+
+    <button id="load">Load the shelf</button>
+  </main>
+
   <footer>
     <p>247233</p>
   </footer>
 
-  <!-- JavaScript -->
   <script>
-    async function loadShelf() {
-      const btn = document.getElementById("load");
-      const status = document.getElementById("status");
+    const button = document.getElementById("load");
+    const status = document.getElementById("status");
 
-      // Topic 6: Change status text and disable button
+    async function loadShelf() {
       status.textContent = "Loading…";
-      btn.disabled = true;
+      button.disabled = true;
 
       try {
-        // Topic 7: Request pen, copy, and tea in parallel
-        const [penRes, copyRes, teaRes] = await Promise.all([
-          fetch("/pen"),
-          fetch("/copy"),
-          fetch("/tea")
+        // Request all three prices concurrently.
+        const [penData, copyData, teaData] = await Promise.all([
+          fetch("/api/price?item=pen").then(response => {
+            if (!response.ok) {
+              throw new Error("Pen request failed");
+            }
+            return response.json();
+          }),
+
+          fetch("/api/price?item=copy").then(response => {
+            if (!response.ok) {
+              throw new Error("Copy request failed");
+            }
+            return response.json();
+          }),
+
+          fetch("/api/price?item=tea").then(response => {
+            if (!response.ok) {
+              throw new Error("Tea request failed");
+            }
+            return response.json();
+          })
         ]);
 
-        // Check if server responses are valid
-        if (!penRes.ok || !copyRes.ok || !teaRes.ok) {
-          throw new Error("Server error");
+        // Read the prices returned by server.js.
+        const penPrice = penData.price;
+        const copyPrice = copyData.price;
+        const teaPrice = teaData.price;
+
+        // Validate the returned prices.
+        if (
+          !Number.isFinite(penPrice) ||
+          !Number.isFinite(copyPrice) ||
+          !Number.isFinite(teaPrice)
+        ) {
+          throw new Error("Invalid price response");
         }
 
-        const penText = await penRes.text();
-        const copyText = await copyRes.text();
-        const teaText = await teaRes.text();
+        // Display the three prices on the board.
+        document.getElementById("pen").textContent = penPrice;
+        document.getElementById("copy").textContent = copyPrice;
+        document.getElementById("tea").textContent = teaPrice;
 
-        // Update card prices on the board
-        document.getElementById("pen").textContent = penText;
-        document.getElementById("copy").textContent = copyText;
-        document.getElementById("tea").textContent = teaText;
+        // Calculate the till values from the server replies.
+        document.getElementById("loaded").textContent = 3;
 
-        // Parse prices as numbers
-        const pPen = Number(penText);
-        const pCopy = Number(copyText);
-        const pTea = Number(teaText);
+        document.getElementById("dearest").textContent =
+          Math.max(penPrice, copyPrice, teaPrice);
 
-        // Topic 8: Update Till display
-        document.getElementById("loaded").textContent = "3";
-        document.getElementById("dearest").textContent = Math.max(pPen, pCopy, pTea);
-        document.getElementById("sum").textContent = pPen + pCopy + pTea;
+        document.getElementById("sum").textContent =
+          penPrice + copyPrice + teaPrice;
 
-        // Reset status line after successful load
         status.textContent = "Shelf loaded.";
-      } catch (err) {
-        // Topic 9: Handle stopped server / network failure
+
+      } catch (error) {
+        // Handle a stopped server or failed request.
         status.textContent = "The server is not answering.";
-        
-        // Blank the three prices
+
+        // Blank all three prices.
         document.getElementById("pen").textContent = "";
         document.getElementById("copy").textContent = "";
         document.getElementById("tea").textContent = "";
 
-        // Reset Loaded, Dearest, and Sum back to 0
-        document.getElementById("loaded").textContent = "0";
-        document.getElementById("dearest").textContent = "0";
-        document.getElementById("sum").textContent = "0";
+        // Reset all till values.
+        document.getElementById("loaded").textContent = 0;
+        document.getElementById("dearest").textContent = 0;
+        document.getElementById("sum").textContent = 0;
+
       } finally {
-        // Topic 10: Ensure the button becomes clickable again
-        btn.disabled = false;
+        // Allow the user to click again after success or failure.
+        button.disabled = false;
       }
     }
 
-    // Topic 5: Attach event listener
-    document.getElementById("load").addEventListener("click", loadShelf);
+    // Register the click handler without loading on page startup.
+    button.addEventListener("click", loadShelf);
   </script>
 
 </body>
